@@ -7,11 +7,13 @@ public partial class InputControl : UserControl
 {
     public static readonly DependencyProperty LabelProperty;
     public static readonly DependencyProperty InputTextProperty;
+    public static readonly DependencyProperty IsReadOnlyProperty;
 
     static InputControl()
     {
         LabelProperty = DependencyProperty.Register(nameof(Label), typeof(string), typeof(InputControl));
         InputTextProperty = DependencyProperty.Register(nameof(InputText), typeof(string), typeof(InputControl));
+        IsReadOnlyProperty = DependencyProperty.Register(nameof(IsReadOnly), typeof(bool), typeof(InputControl));
     }
     
     public string Label
@@ -24,6 +26,12 @@ public partial class InputControl : UserControl
     {
         get => (string)GetValue(InputTextProperty); 
         set => SetValue(InputTextProperty, value);
+    }
+
+    public bool IsReadOnly
+    {
+        get => (bool)GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
     }
     
     public InputControl()

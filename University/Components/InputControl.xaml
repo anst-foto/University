@@ -12,6 +12,7 @@
         <Label Content="{Binding Label, Mode=OneWay}"
                Grid.Column="0"/>
         <TextBox Text="{Binding InputText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                 IsReadOnly="{Binding IsReadOnly, Mode=OneWay}"
                  Grid.Column="1"/>
     </Grid>
 </UserControl>

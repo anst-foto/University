@@ -6,7 +6,7 @@ public class Teacher
 {
     public Guid Id { get; set; }
     [NotMapped]
-    public string ShortId => $"{Id.ToString("B")[1..8]}";
+    public string ShortId => $"{Id.ToString("B")[1..9]}";
     public string LastName { get; set; }
     public string FirstName { get; set; }
     

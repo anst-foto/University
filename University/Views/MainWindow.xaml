@@ -11,11 +11,23 @@
         <vm:MainWindowViewModel/>
     </Window.DataContext>
     
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Control" Key="S"
+                    Command="{Binding CommandSave}"/>
+    </Window.InputBindings>
+    
     <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Операции">
+                <MenuItem Header="Сохранить" 
+                          Command="{Binding CommandSave}" 
+                          InputGestureText="Ctrl+S"/>
+            </MenuItem>
+        </Menu>
         <StackPanel Orientation="Horizontal"
                     DockPanel.Dock="Top">
             <c:InputControl Label="Поиск"
-                            InputText="{Binding SearchText }"/>
+                            InputText="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
             <Button Content="Найти"
                     Command="{Binding CommandSearch}"/>
             <Button Content="Очистить"
@@ -42,7 +54,8 @@
             
             <StackPanel Grid.Column="1">
                 <c:InputControl Label="ID"
-                                InputText="{Binding Id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                InputText="{Binding Id, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                IsReadOnly="True"/>
                 <c:InputControl Label="Фамилия"
                                 InputText="{Binding LastName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                 <c:InputControl Label="Имя"
