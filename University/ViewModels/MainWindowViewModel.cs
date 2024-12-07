@@ -2,12 +2,13 @@
 using System.Windows.Input;
 using Microsoft.EntityFrameworkCore;
 using University.Models;
+using University.Services;
 
 namespace University.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private readonly DataBaseContext _db;
+    private readonly TeacherService _teacherService;
     
     #region ObservableProperties
 
@@ -86,14 +87,10 @@ public class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         var connectionString = App.Current.Resources["ConnectionString"] as string;
-        _db = new DataBaseContext(connectionString);
-        _db.Teachers
-            .Include(t => t.Faculty)
-            .Include(t => t.Subjects)
-            .ToList();
+        _teacherService = new TeacherService(new DataBaseContext(connectionString));
         
-        InitTeachers(_db.Teachers);
-        InitFaculties(_db.Faculties);
+        InitTeachers(_teacherService.Teachers);
+        InitFaculties(_teacherService.Faculties);
 
         CommandSave = new RelayCommand(ExecSave, CanExecSave);
         CommandClear = new RelayCommand(ExecClear, CanExecClear);
@@ -146,7 +143,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (SelectedTeacher is null)
         {
-            _db.Teachers.Add(new Teacher()
+            _teacherService.AddTeacher(new Teacher()
             {
                 Id = Guid.NewGuid(),
                 LastName = LastName!,
@@ -157,17 +154,18 @@ public class MainWindowViewModel : ViewModelBase
         }
         else
         {
-            var teacher = _db.Teachers.Single(t => t.Id == SelectedTeacher.Id);
-            teacher.LastName = LastName!;
-            teacher.FirstName = FirstName!;
-            teacher.Faculty = SelectedFaculty!;
-            teacher.Subjects = Subjects.ToList();
+            _teacherService.UpdateTeacher(new Teacher()
+            {
+                Id = SelectedTeacher!.Id,
+                LastName = LastName!,
+                FirstName = FirstName!,
+                Faculty = SelectedFaculty!,
+                Subjects = Subjects.ToList()
+            });
         }
         
-        _db.SaveChanges();
-        
         ExecClear();
-        InitTeachers(_db.Teachers);
+        InitTeachers(_teacherService.Teachers);
     }
 
     private bool CanExecSave(object? parameter = null)
@@ -193,12 +191,10 @@ public class MainWindowViewModel : ViewModelBase
     
     private void ExecDelete(object? parameter = null)
     {
-        var teacher = _db.Teachers.Single(t => t.Id == SelectedTeacher!.Id);
-        _db.Teachers.Remove(teacher);
-        _db.SaveChanges();
+        _teacherService.DeleteTeacher(SelectedTeacher!.Id);
         
         ExecClear();
-        InitTeachers(_db.Teachers);
+        InitTeachers(_teacherService.Teachers);
     }
     
     private bool CanExecDelete(object? parameter = null)
@@ -208,9 +204,7 @@ public class MainWindowViewModel : ViewModelBase
     
     private void ExecSearch(object? parameter = null)
     {
-        var result = _db.Teachers
-            .Where(t => t.LastName.ToLower().Contains(SearchText!.ToLower()) ||
-                        t.FirstName.ToLower().Contains(SearchText!.ToLower()));
+        var result = _teacherService.GetTeacher(SearchText!);
         InitTeachers(result);
     }
     
