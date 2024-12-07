@@ -8,7 +8,7 @@ namespace University.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private readonly TeacherService _teacherService;
+    private readonly ITeacherService _teacherService;
     
     #region ObservableProperties
 
@@ -87,7 +87,7 @@ public class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel()
     {
         var connectionString = App.Current.Resources["ConnectionString"] as string;
-        _teacherService = new TeacherService(new DataBaseContext(connectionString));
+        _teacherService = new TeacherServiceWithLog(new DataBaseContext(connectionString));
         
         InitTeachers(_teacherService.Teachers);
         InitFaculties(_teacherService.Faculties);
@@ -143,25 +143,27 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (SelectedTeacher is null)
         {
-            _teacherService.AddTeacher(new Teacher()
+            var teacher = new Teacher()
             {
                 Id = Guid.NewGuid(),
                 LastName = LastName!,
                 FirstName = FirstName!,
                 Faculty = SelectedFaculty!,
                 Subjects = Subjects.ToList()
-            });
+            };
+            _teacherService.AddTeacher(teacher);
         }
         else
         {
-            _teacherService.UpdateTeacher(new Teacher()
+            var teacher = new Teacher()
             {
                 Id = SelectedTeacher!.Id,
                 LastName = LastName!,
                 FirstName = FirstName!,
                 Faculty = SelectedFaculty!,
                 Subjects = Subjects.ToList()
-            });
+            };
+            _teacherService.UpdateTeacher(teacher);
         }
         
         ExecClear();
@@ -204,7 +206,7 @@ public class MainWindowViewModel : ViewModelBase
     
     private void ExecSearch(object? parameter = null)
     {
-        var result = _teacherService.GetTeacher(SearchText!);
+        var result = _teacherService.GetTeachers(SearchText!);
         InitTeachers(result);
     }
     
